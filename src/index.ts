@@ -14,10 +14,12 @@ const db = pgp(databaseUrl);
 
 const app = express();
 
-app.get("/", (req, res) => {
-  db.one("SELECT $1 AS value", [123])
-    .then((data) => {
-      res.status(200).json({ message: "Hello World", data: data.value });
+app.use(express.json());
+
+app.get("/tasks", (req, res) => {
+  db.query("SELECT * FROM tasktracker.tasks")
+    .then((data) => {      
+      res.status(200).json(data);
     })
     .catch((error) => {
       res.status(500).json({ error: error.message });
