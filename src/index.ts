@@ -1,16 +1,24 @@
+import "dotenv/config";
 import express from "express";
 import pgPromise from "pg-promise";
 
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error(
+    "DATABASE_URL is not set. Copy .env.example to .env and configure DATABASE_URL.",
+  );
+}
+
 const pgp = pgPromise();
-const db = pgp("postgres://user:password@localhost:5432/tasktracker");
+const db = pgp(databaseUrl);
 
 const app = express();
 
 app.get("/", (req, res) => {
   db.one("SELECT $1 AS value", [123])
-  .then((data) => {
-    res.status(200).json({message: "Hello World", data: data.value});
-  })
+    .then((data) => {
+      res.status(200).json({ message: "Hello World", data: data.value });
+    })
     .catch((error) => {
       res.status(500).json({ error: error.message });
     });
